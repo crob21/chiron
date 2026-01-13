@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://chiron:chiron@db:5432/chiron
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - API_SECRET_KEY=${API_SECRET_KEY}
+      - TRUECOACH_CLIENT_ID=${TRUECOACH_CLIENT_ID}
+      - TRUECOACH_CLIENT_SECRET=${TRUECOACH_CLIENT_SECRET}
+      - MFP_USERNAME=${MFP_USERNAME}
+      - MFP_PASSWORD=${MFP_PASSWORD}
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=chiron
+      - POSTGRES_PASSWORD=chiron
+      - POSTGRES_DB=chiron
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -1,0 +1,38 @@
+services:
+  # Main Chiron API
+  - type: web
+    name: chiron-api
+    env: python
+    runtime: python-3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chiron-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: API_SECRET_KEY
+        generateValue: true
+      - key: TRUECOACH_CLIENT_ID
+        sync: false
+      - key: TRUECOACH_CLIENT_SECRET
+        sync: false
+      - key: TRUECOACH_REDIRECT_URI
+        value: https://chiron-api.onrender.com/auth/truecoach/callback
+      - key: MFP_USERNAME
+        sync: false
+      - key: MFP_PASSWORD
+        sync: false
+      - key: SYNC_INTERVAL_MINUTES
+        value: "30"
+      - key: LOG_LEVEL
+        value: INFO
+    healthCheckPath: /health
+
+databases:
+  - name: chiron-db
+    databaseName: chiron
+    user: chiron_user
+    plan: starter
